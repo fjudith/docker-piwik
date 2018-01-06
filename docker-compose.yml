@@ -1,0 +1,33 @@
+piwik-md:
+  image: mariadb:10.0
+  environment:
+    MYSQL_DATABASE: piwik
+    MYSQL_PASSWORD: Chang3M3
+    MYSQL_ROOT_PASSWORD: Change3M34ls0
+    MYSQL_USER: piwik
+  volumes:
+  - piwik-md:/var/lib/mysql
+
+piwik-mc:
+  image: memcached
+
+piwik-nginx:
+  image: fjudith/nginx
+  ports:
+  - 32716:443/tcp
+  - 32715:80/tcp
+  links:
+  - piwik-mc:memcached
+  - piwik:piwik
+  volumes:
+  - piwik-data:/var/www/html:ro
+  - piwik-nginx-config:/etc/nginx
+  - piwik-nginx-log:/var/log/nginx
+
+piwik:
+  image: fjudith/piwik:fpm
+  links:
+  - piwik-mc:memcached
+  - piwik-md:mysql
+  volumes:
+  - piwik-data:/var/www/html
